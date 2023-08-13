@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Your Tasks</h2>
+<h2 class="text-center my-3">Your Tasks</h2>
 {% if tasks %}
 <div class="px-5">
     <table class="table table-bordered">
@@ -25,10 +25,10 @@
                     Incomplete
                 {% endif %}
             </td>
-            <td>
-                <a href="{% url 'delete_task' task.id %}">Delete</a>
-                <a href="{% url 'edit_task' task.id %}">Edit</a>
-                <a href="{% url 'complete_task' task.id %}">Complete</a>
+            <td class="d-grid gap-2 d-md-block">
+                <a class="btn btn-sm btn-danger" href="{% url 'delete_task' task.id %}">Delete</a>
+                <a class="btn btn-sm btn-primary" href="{% url 'edit_task' task.id %}">Edit</a>
+                <a class="btn btn-sm btn-success" href="{% url 'complete_task' task.id %}">Complete</a>
             </td>
           </tr>
           {% endfor %}
