@@ -37,4 +37,11 @@
 </div>
 {% endif %}
 
+<hr style="border-top: 3px dotted #838282;" class="dotted mt-5">
+
+<div class="d-grid gap-2 d-md-block text-center mx-5">
+    <a class="btn btn-primary" href="{% url 'add_task' %}">Add Task</a>
+    <a class="btn btn-primary" href="{% url 'completed_tasks' %}">View Completed Tasks</a>
+</div>
+
 {% endblock %}

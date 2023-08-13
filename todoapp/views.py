@@ -40,3 +40,8 @@ def delete_task(request, task_id):
 def completed_tasks(request):
     tasks = TaskModel.objects.filter(is_completed=True)
     return render(request, 'completed_tasks.html', {'tasks': tasks})
+
+def completed_task_delete(request, task_id):
+    task = TaskModel.objects.get(pk=task_id)
+    task.delete()
+    return redirect('completed_tasks')

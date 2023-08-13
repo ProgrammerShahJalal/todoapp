@@ -1,5 +1,5 @@
 from django.urls import path
-from todoapp.views import add_task, show_tasks, edit_task, complete_task, delete_task
+from todoapp.views import add_task, show_tasks, edit_task, complete_task, delete_task, completed_tasks, completed_task_delete
 
 urlpatterns = [
     path('', show_tasks, name='show_tasks'),
@@ -8,5 +8,6 @@ urlpatterns = [
     path('edit_task/<int:task_id>/', edit_task, name='edit_task'),
     path('complete_task/<int:task_id>/', complete_task, name='complete_task'),
     path('delete_task/<int:task_id>/', delete_task, name='delete_task'),
-    # path('completed_tasks/', completed_tasks, name='completed_tasks'),
+    path('completed_tasks/', completed_tasks, name='completed_tasks'),
+    path('completed_task_delete/<int:task_id>/', completed_task_delete, name='completed_task_delete'),
 ]

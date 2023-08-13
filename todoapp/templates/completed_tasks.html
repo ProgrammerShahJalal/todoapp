@@ -1,11 +1,42 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Completed Tasks</h2>
-<ul>
-    {% for task in tasks %}
-        <li>{{ task.taskTitle }} - {{ task.taskDescription }}</li>
-    {% endfor %}
-</ul>
-<a href="{% url 'show_tasks' %}">Back to Tasks</a>
+<h2 class="text-center py-3">Completed Tasks</h2>
+{% if tasks %}
+<div class="px-5">
+    <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+          <tr>
+            <td>{{ task.taskTitle }}</td>
+            <td>{{ task.taskDescription }}</td>
+            <td>
+                {% if task.is_completed %}
+                    Complete
+                {% else %}
+                    Incomplete
+                {% endif %}
+            </td>
+            <td class="d-grid gap-2 d-md-block">
+                <a class="btn btn-sm btn-danger" href="{% url 'completed_task_delete' task.id %}">Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+</div>
+{% endif %}
+<hr style="border-top: 3px dotted #838282;" class="dotted">
+<div class=" text-center">
+    <a class="btn btn-primary" href="{% url 'show_tasks' %}">Back to Tasks</a>
+</div>
+
 {% endblock %}
