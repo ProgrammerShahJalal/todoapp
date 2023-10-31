@@ -18,13 +18,14 @@ def show_tasks(request):
 
 def edit_task(request, task_id):
     task = TaskModel.objects.get(pk=task_id)
-    form = TaskForm(instance=task)
     if request.method == 'POST':
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
             return redirect('show_tasks')
-    return render(request, 'edit_task.html', {'form': form})
+    else:
+        form = TaskForm(instance=task)
+    return render(request, 'edit_task.html', {'form': form, 'task': task})
 
 def complete_task(request, task_id):
     task = TaskModel.objects.get(pk=task_id)
