@@ -1,5 +1,12 @@
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
+from .forms import RegisterForm
+from django.urls import reverse_lazy
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordResetForm
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import PasswordResetView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files import File
 from django.db.models import Q
 from datetime import datetime
@@ -9,6 +16,53 @@ from .models import TaskModel, Photo
 from .forms import TaskForm, TaskFilterForm
 
 
+
+@login_required
+def home(request):
+    return render(request, 'home.html')
+
+""" ================ AUTHENTICATION START ============== """
+
+# user register
+def user_register(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save() 
+            return redirect('login') 
+    else:
+        form = RegisterForm()
+    
+    return render(request, 'registration/register.html', {'form': form})
+
+# user login
+def user_login(request):
+    if not request.user.is_authenticated:
+        if request.method == 'POST':
+            form = AuthenticationForm(request = request, data = request.POST)
+            if form.is_valid():
+                username = form.cleaned_data['username']
+                password = form.cleaned_data['password']
+                user = authenticate(username = username, password = password)
+
+                if user is not None:
+                    login(request, user)
+                    return redirect('home')
+        else:
+            form = AuthenticationForm()
+        return render(request, 'registration/login.html', {'form': form})
+    else:
+        return redirect('home')
+
+def user_logout(request):
+    logout(request)
+
+    return redirect('login')
+
+
+
+
+""" ================ AUTHENTICATION END ============== """
 
 def add_task(request):
     if request.method == 'POST':
@@ -92,11 +146,11 @@ def show_tasks(request):
         due_date = datetime.strptime(due_date, "%Y-%m-%d")
         due_date = pytz.timezone('UTC').localize(due_date)
         due_date = due_date.astimezone(pytz.timezone(user_timezone))
-    
+
         # Calculate the date range for filtering tasks
         start_date = due_date.replace(hour=0, minute=0, second=0)
         end_date = due_date.replace(hour=23, minute=59, second=59)
-    
+
         # Filter tasks with due dates that fall within the date range
         tasks = tasks.filter(taskDueDate__gte=start_date, taskDueDate__lte=end_date)
 
