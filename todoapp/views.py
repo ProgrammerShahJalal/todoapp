@@ -1,8 +1,14 @@
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.core.files import File
+from django.db.models import Q
+from datetime import datetime
+from django.utils import timezone
+import pytz
 from .models import TaskModel, Photo
-from .forms import TaskForm
+from .forms import TaskForm, TaskFilterForm
+
+
 
 def add_task(request):
     if request.method == 'POST':
@@ -20,8 +26,13 @@ def add_task(request):
         form = TaskForm()
     return render(request, 'add_task.html', {'form': form})
 
+
+
+
 def edit_task(request, task_id):
     task = TaskModel.objects.get(pk=task_id)
+    user_timezone = request.session.get('user_timezone', 'UTC')  # Retrieve the user's time zone
+
     if request.method == 'POST':
         form = TaskForm(request.POST, request.FILES, instance=task)
         if form.is_valid():
@@ -42,12 +53,59 @@ def edit_task(request, task_id):
             return redirect('show_tasks')
     else:
         form = TaskForm(instance=task)
-    return render(request, 'edit_task.html', {'form': form, 'task': task})
+    return render(request, 'edit_task.html', {'form': form, 'task': task, 'user_timezone': user_timezone})
+
+
+
 
 
 def show_tasks(request):
+    user_timezone = request.session.get('user_timezone', 'UTC')  # Retrieve the user's time zone
+
+    title = request.GET.get('title')
+    created_at = request.GET.get('created_at')
+    priority = request.GET.get('priority')
+    is_completed = request.GET.get('is_completed')
+    due_date = request.GET.get('due_date')
+
     tasks = TaskModel.objects.all()
-    return render(request, 'show_tasks.html', {'tasks': tasks})
+
+    if title:
+        tasks = tasks.filter(taskTitle__icontains=title)
+
+    if created_at:
+        # Parse the date string and convert to user's timezone
+        created_at = datetime.strptime(created_at, "%Y-%m-%d").date()
+        created_at = pytz.timezone('UTC').localize(datetime(created_at.year, created_at.month, created_at.day))
+        created_at = created_at.astimezone(pytz.timezone(user_timezone))
+        # Filter tasks based on the date
+        tasks = tasks.filter(created_at__date=created_at)
+
+    if priority:
+        tasks = tasks.filter(taskPriority=priority)
+
+    if is_completed:
+        tasks = tasks.filter(is_completed=is_completed == 'true')
+
+    if due_date:
+        # Parse the date string and convert to the user's timezone
+        due_date = datetime.strptime(due_date, "%Y-%m-%d").date()
+        due_date = pytz.timezone('UTC').localize(datetime(due_date.year, due_date.month, due_date.day))
+        due_date = due_date.astimezone(pytz.timezone(user_timezone))
+    
+        # Filter tasks with due dates less than or equal to the selected due_date
+        tasks = tasks.filter(taskDueDate__lte=due_date)
+
+        # Check if the "Clear All" button was clicked
+    if 'clear_all' in request.GET:
+        return redirect('show_tasks')
+
+
+    return render(request, 'show_tasks.html', {'tasks': tasks, 'user_timezone': user_timezone})
+
+
+
+
 
 def complete_task(request, task_id):
     task = TaskModel.objects.get(pk=task_id)

@@ -2,6 +2,47 @@
 
 {% block content %}
 <h2 class="text-center my-3 text-success">My Tasks</h2>
+
+<div class="mx-5 my-3">
+    <form method="get" action="" id="filter-form">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="title">Search by Title:</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="Enter title">
+            </div>
+            <div class="col-md-4">
+                <label for="created_at">Filter by Created At:</label>
+                <input type="date" id="created_at" name="created_at" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label for="priority">Filter by Priority:</label>
+                <select id="priority" name="priority" class="form-control">
+                    <option value="">Select Priority</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="is_completed">Filter by Status:</label>
+                <select id="is_completed" name="is_completed" class="form-control">
+                    <option value="">Select Status</option>
+                    <option value="true">Complete</option>
+                    <option value="false">Incomplete</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="due_date">Filter by Due Date:</label>
+                <input type="date" id="due_date" name="due_date" class="form-control">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Apply Filters</button>
+        <a href="?clear_all" class="btn btn-secondary">Clear All</a>
+    </form>
+</div>
+
 {% if tasks %}
 <div class="px-5 table-responsive">
     <table class="table table-hover table-bordered align-middle text-center">
@@ -13,6 +54,7 @@
                 <th scope="col">Priority</th>
                 <th scope="col">Status</th>
                 <th scope="col">Created At</th>
+                <th scope="col">Updated At</th>
                 <th scope="col">Photos</th>
                 <th scope="col">Action</th>
             </tr>
@@ -32,6 +74,7 @@
                     {% endif %}
                 </td>
                 <td>{{ task.created_at }}</td>
+                <td>{{ task.updated_at }}</td>
                 <td>
                     <ul>
                         {% for photo in task.images.all %}
@@ -42,13 +85,13 @@
                 <td class="align-middle">
                     <div class="d-grid">
                         {% if not task.is_completed %}
-                        <a class="btn btn-sm btn-primary m-1" href="{% url 'edit_task' task.id %}">Edit</a>
-                        <a class="btn btn-sm btn-success m-1" href="{% url 'complete_task' task.id %}">Complete</a>
-                        <a class="btn btn-sm btn-danger m-1" href="{% url 'delete_task' task.id %}" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
-                    {% endif %}
-                    {% if task.is_completed %}
-                        <a class="btn btn-sm btn-danger m-1" href="{% url 'delete_task' task.id %}" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
-                    {% endif %}
+                            <a class="btn btn-sm btn-primary m-1" href="{% url 'edit_task' task.id %}">Edit</a>
+                            <a class="btn btn-sm btn-success m-1" href="{% url 'complete_task' task.id %}">Complete</a>
+                            <a class="btn btn-sm btn-danger m-1" href="{% url 'delete_task' task.id %}" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                        {% endif %}
+                        {% if task.is_completed %}
+                            <a class="btn btn-sm btn-danger m-1" href="{% url 'delete_task' task.id %}" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                        {% endif %}
                     </div>
                 </td>
             </tr>
