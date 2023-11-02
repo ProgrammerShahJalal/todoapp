@@ -89,12 +89,17 @@ def show_tasks(request):
 
     if due_date:
         # Parse the date string and convert to the user's timezone
-        due_date = datetime.strptime(due_date, "%Y-%m-%d").date()
-        due_date = pytz.timezone('UTC').localize(datetime(due_date.year, due_date.month, due_date.day))
+        due_date = datetime.strptime(due_date, "%Y-%m-%d")
+        due_date = pytz.timezone('UTC').localize(due_date)
         due_date = due_date.astimezone(pytz.timezone(user_timezone))
     
-        # Filter tasks with due dates less than or equal to the selected due_date
-        tasks = tasks.filter(taskDueDate__lte=due_date)
+        # Calculate the date range for filtering tasks
+        start_date = due_date.replace(hour=0, minute=0, second=0)
+        end_date = due_date.replace(hour=23, minute=59, second=59)
+    
+        # Filter tasks with due dates that fall within the date range
+        tasks = tasks.filter(taskDueDate__gte=start_date, taskDueDate__lte=end_date)
+
 
         # Check if the "Clear All" button was clicked
     if 'clear_all' in request.GET:
