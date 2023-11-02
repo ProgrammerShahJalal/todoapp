@@ -6,38 +6,46 @@
 <div class="px-5 table-responsive">
     <table class="table table-bordered">
         <thead>
-          <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Description</th>
-            <th scope="col">Due Date</th>
-            <th scope="col">Priority</th>
-            <th scope="col">Status</th>
-            <th scope="col">Action</th>
-          </tr>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Due Date</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Status</th>
+                <th scope="col">Photos</th>
+                <th scope="col">Action</th>
+            </tr>
         </thead>
         <tbody>
             {% for task in tasks %}
-          <tr>
-            <td>{{ task.taskTitle }}</td>
-            <td class="w-50">{{ task.taskDescription }}</td>
-            <td>{{ task.taskDueDate }}</td>
-            <td>{{ task.taskPriority }}</td>
-            <td>
-                {% if task.is_completed %}
-                    Complete
-                {% else %}
-                    Incomplete
-                {% endif %}
-            </td>
-            <td class="d-grid gap-2 d-md-block">
-              <a class="btn btn-sm btn-danger" href="{% url 'delete_task' task.id %}" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
-                <a class="btn btn-sm btn-primary" href="{% url 'edit_task' task.id %}">Edit</a>
-                <a class="btn btn-sm btn-success" href="{% url 'complete_task' task.id %}">Complete</a>
-            </td>
-          </tr>
-          {% endfor %}
+            <tr>
+                <td>{{ task.taskTitle }}</td>
+                <td class="w-25">{{ task.taskDescription }}</td>
+                <td>{{ task.taskDueDate }}</td>
+                <td>{{ task.taskPriority }}</td>
+                <td>
+                    {% if task.is_completed %}
+                        Complete
+                    {% else %}
+                        Incomplete
+                    {% endif %}
+                </td>
+                <td>
+                    <ul>
+                        {% for photo in task.images.all %}
+                            <li><img class="p-1" src="{{ photo.image.url }}" width="100" height="100" alt="Task Photo"></li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td class="d-grid gap-2 d-md-block">
+                    <a class="btn btn-sm btn-danger" href="{% url 'delete_task' task.id %}" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                    <a class="btn btn-sm btn-primary" href="{% url 'edit_task' task.id %}">Edit</a>
+                    <a class="btn btn-sm btn-success" href="{% url 'complete_task' task.id %}">Complete</a>
+                </td>
+            </tr>
+            {% endfor %}
         </tbody>
-      </table>
+    </table>
 </div>
 {% endif %}
 

@@ -5,15 +5,19 @@
 
 <div class="w-50 m-auto">
     <h2 class="text-center">Add a New Task</h2>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{form | crispy}}
+        {{ form | crispy }}
+
+        <!-- Manually render the file input field with the 'multiple' attribute -->
+        <input type="file" name="images" id="id_images" multiple>
+<br/><br/>
         <button class="btn btn-success" type="submit">Submit</button>
     </form>
-
 </div>
-<hr style="border-top: 3px dotted #838282;" class="dotted">
-<div class=" text-center">
+
+<hr style="border-top: 3px dotted #838282;" class=" dotted">
+<div class="text-center">
     <a class="btn btn-primary ms-5" href="{% url 'show_tasks' %}">Back to Tasks</a>
 </div>
 
