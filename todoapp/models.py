@@ -12,6 +12,7 @@ class TaskModel(models.Model):
         ('high', 'High'),
     ])
     images = models.ManyToManyField('Photo', related_name='tasks', blank=True)
+    created_at = models.DateTimeField(default=timezone.localtime)
 
     def delete(self, *args, **kwargs):
         # Delete associated images when a task is deleted

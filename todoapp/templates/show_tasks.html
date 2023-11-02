@@ -12,6 +12,7 @@
                 <th scope="col">Due Date</th>
                 <th scope="col">Priority</th>
                 <th scope="col">Status</th>
+                <th scope="col">Created At</th>
                 <th scope="col">Photos</th>
                 <th scope="col">Action</th>
             </tr>
@@ -30,6 +31,7 @@
                         Incomplete
                     {% endif %}
                 </td>
+                <td>{{ task.created_at }}</td>
                 <td>
                     <ul>
                         {% for photo in task.images.all %}
@@ -38,7 +40,8 @@
                     </ul>
                 </td>
                 <td class="align-middle">
-                    {% if not task.is_completed %}
+                    <div class="d-grid">
+                        {% if not task.is_completed %}
                         <a class="btn btn-sm btn-primary m-1" href="{% url 'edit_task' task.id %}">Edit</a>
                         <a class="btn btn-sm btn-success m-1" href="{% url 'complete_task' task.id %}">Complete</a>
                         <a class="btn btn-sm btn-danger m-1" href="{% url 'delete_task' task.id %}" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
@@ -46,6 +49,7 @@
                     {% if task.is_completed %}
                         <a class="btn btn-sm btn-danger m-1" href="{% url 'delete_task' task.id %}" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
                     {% endif %}
+                    </div>
                 </td>
             </tr>
             {% endfor %}
