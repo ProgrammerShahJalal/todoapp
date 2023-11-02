@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.core.files.storage import default_storage
+from django.core.files import File
 from .models import TaskModel, Photo
 from .forms import TaskForm
 
@@ -23,15 +25,20 @@ def edit_task(request, task_id):
     if request.method == 'POST':
         form = TaskForm(request.POST, request.FILES, instance=task)
         if form.is_valid():
-            task = form.save()
+            # Delete existing images
+            for image in task.images.all():
+                # Delete image file from the storage
+                default_storage.delete(image.image.name)
+                # Delete the Photo object
+                image.delete()
 
-            # Remove existing images and add the new ones
-            task.images.clear()
+            # Add the new images
             for image in request.FILES.getlist('images'):
                 photo = Photo(image=image)
                 photo.save()
                 task.images.add(photo)
 
+            task = form.save()
             return redirect('show_tasks')
     else:
         form = TaskForm(instance=task)
@@ -39,7 +46,7 @@ def edit_task(request, task_id):
 
 
 def show_tasks(request):
-    tasks = TaskModel.objects.filter(is_completed=False)
+    tasks = TaskModel.objects.all()
     return render(request, 'show_tasks.html', {'tasks': tasks})
 
 def complete_task(request, task_id):
