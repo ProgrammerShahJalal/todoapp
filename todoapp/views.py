@@ -135,6 +135,7 @@ def show_tasks(request):
         created_at = created_at.astimezone(pytz.timezone(user_timezone))
         # Filter tasks based on the date
         tasks = tasks.filter(created_at__date=created_at)
+        tasks = tasks.filter(created_at__range=(created_at_start, created_at_end))
 
     if priority:
         tasks = tasks.filter(taskPriority=priority)

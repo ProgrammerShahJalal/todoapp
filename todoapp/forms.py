@@ -17,7 +17,9 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = TaskModel
         fields = ('taskTitle', 'taskDescription', 'taskDueDate', 'taskPriority')
-
+        widgets = {
+            'taskDueDate': forms.DateTimeInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
+            }
 
 class TaskFilterForm(forms.Form):
     title = forms.CharField(max_length=100, required=False)

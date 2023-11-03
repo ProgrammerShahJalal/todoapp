@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div class="w-full mx-auto text-center px-5 mt-5">
+<div class="w-full mx-auto text-center px-5">
     <h2>Welcome to Your Task Manager</h2>
     {% if user.is_authenticated %}
       <p>Hello, {{ user.username }}. You are logged in.</p>
@@ -17,7 +17,7 @@
 
 <h2 class="text-center my-3 text-success">My Tasks</h2>
 
-{% if tasks %}
+
 <div class="mx-5 my-3">
     <form method="get" action="" id="filter-form">
         <div class="row mb-3">
@@ -57,7 +57,7 @@
         <a href="?clear_all" class="btn btn-secondary">Clear All</a>
     </form>
 </div>
-{% endif %}
+
 
 {% if tasks %}
 <div class="px-5 table-responsive">
