@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import default_storage
 from .forms import RegisterForm
 from django.urls import reverse_lazy
@@ -82,37 +82,6 @@ def add_task(request):
 
 
 
-
-@login_required
-def edit_task(request, task_id):
-    task = TaskModel.objects.get(pk=task_id)
-    user_timezone = request.session.get('user_timezone', 'UTC')  # Retrieve the user's time zone
-
-    if request.method == 'POST':
-        form = TaskForm(request.POST, request.FILES, instance=task)
-        if form.is_valid():
-            # Delete existing images
-            for image in task.images.all():
-                # Delete image file from the storage
-                default_storage.delete(image.image.name)
-                # Delete the Photo object
-                image.delete()
-
-            # Add the new images
-            for image in request.FILES.getlist('images'):
-                photo = Photo(image=image)
-                photo.save()
-                task.images.add(photo)
-
-            task = form.save()
-            return redirect('show_tasks')
-    else:
-        form = TaskForm(instance=task)
-    return render(request, 'edit_task.html', {'form': form, 'task': task, 'user_timezone': user_timezone})
-
-
-
-
 @login_required
 def show_tasks(request):
     user_timezone = request.session.get('user_timezone', 'UTC')  # Retrieve the user's time zone
@@ -164,6 +133,47 @@ def show_tasks(request):
 
     return render(request, 'show_tasks.html', {'tasks': tasks, 'user_timezone': user_timezone})
 
+
+
+
+@login_required
+def task_details(request, task_id):
+    task = get_object_or_404(TaskModel, pk=task_id, user=request.user)
+
+
+    return render(request, 'task_details.html', {'task': task})
+
+
+
+
+@login_required
+def update_task(request, task_id):
+    task = get_object_or_404(TaskModel, pk=task_id, user=request.user)
+
+    if request.method == 'POST':
+        form = TaskForm(request.POST, request.FILES, instance=task)
+        if form.is_valid():
+            # Remove existing images if specified
+            if 'delete_images' in request.POST:
+                deleted_images = request.POST.getlist('delete_images')
+                for image_id in deleted_images:
+                    task.images.get(id=image_id).delete()
+
+            # Save the updated task details
+            updated_task = form.save()
+
+            # Add new images
+            for image in request.FILES.getlist('new_images'):
+                photo = Photo(image=image)
+                photo.save()
+                updated_task.images.add(photo)
+
+            return redirect('task_details', task_id=updated_task.id)
+
+    else:
+        form = TaskForm(instance=task)
+
+    return render(request, 'update_task.html', {'form': form, 'task': task})
 
 
 
