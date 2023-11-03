@@ -7,6 +7,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponseForbidden
+from django.template import RequestContext
 from django.core.files import File
 from django.db.models import Q
 from datetime import datetime
@@ -148,32 +150,35 @@ def task_details(request, task_id):
 
 @login_required
 def update_task(request, task_id):
-    task = get_object_or_404(TaskModel, pk=task_id, user=request.user)
+    task = TaskModel.objects.get(pk=task_id)
+    
+    # Check if the task is completed
+    if task.is_completed:
+        # If the task is completed, return a custom response with CSS and a "Go Back" button
+        return render(request, 'forbidden_task.html')
+    
+    user_timezone = request.session.get('user_timezone', 'UTC')
 
     if request.method == 'POST':
         form = TaskForm(request.POST, request.FILES, instance=task)
         if form.is_valid():
-            # Remove existing images if specified
-            if 'delete_images' in request.POST:
-                deleted_images = request.POST.getlist('delete_images')
-                for image_id in deleted_images:
-                    task.images.get(id=image_id).delete()
+            # Delete existing images
+            for image in task.images.all():
+                default_storage.delete(image.image.name)
+                image.delete()
 
-            # Save the updated task details
-            updated_task = form.save()
-
-            # Add new images
+            # Add the new images
             for image in request.FILES.getlist('new_images'):
                 photo = Photo(image=image)
                 photo.save()
-                updated_task.images.add(photo)
+                task.images.add(photo)
 
-            return redirect('task_details', task_id=updated_task.id)
-
+            task = form.save()
+            return redirect('show_tasks')
     else:
         form = TaskForm(instance=task)
-
-    return render(request, 'update_task.html', {'form': form, 'task': task})
+    
+    return render(request, 'update_task.html', {'form': form, 'task': task, 'user_timezone': user_timezone})
 
 
 
@@ -200,3 +205,9 @@ def completed_task_delete(request, task_id):
     task = TaskModel.objects.get(pk=task_id)
     task.delete()
     return redirect('completed_tasks')
+
+
+
+
+def forbidden_task(request):
+    return render(request, 'forbidden_task.html')
