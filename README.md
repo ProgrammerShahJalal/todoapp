@@ -64,7 +64,7 @@ Simultaneously, users can add new images and save their changes.
 <br/>
 <br/>
 <br/>
-<img src="https://i.ibb.co/XLsGLB2/todoapp.png" alt="preview of task management web app">
+<img src="https://i.ibb.co/82PCGPY/Tast-Management-Web-App.png" alt="preview of task management web app">
 
 
 <hr style="border-top: 3px dotted #838282;" class="dotted">

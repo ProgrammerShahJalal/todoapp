@@ -93,9 +93,18 @@
                 <td>{{ task.updated_at }}</td>
                 <td>
                     <ul>
-                        {% for photo in task.images.all %}
-                        <li><img class="m-1 border border-success" src="{{ photo.image.url }}" width="100" height="100" alt="Task Photo"></li>
-                    {% endfor %}
+                        {% if not task.images.all %}
+                        <small>No Photos Uploaded!</small>
+                    {% else %}
+                     
+                            {% for photo in task.images.all %}
+                                <li>
+                                    <img class="m-1 border border-success" src="{{ photo.image.url }}" width="100" height="100" alt="Task Photo">
+                                </li>
+                            {% endfor %}
+                     
+                    {% endif %}
+                    
                     </ul>
                 </td>
                 <td class="align-middle">
