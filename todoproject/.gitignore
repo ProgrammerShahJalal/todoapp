@@ -1,1 +1,31 @@
-settings.py
+# Exclude database files
+*.sqlite3
+db.sqlite3
+
+# Exclude media folder
+/task_photos/
+
+# Exclude compiled Python files
+__pycache__/
+
+# Exclude log files
+*.log
+
+# Exclude environment-specific settings
+.env
+
+# Exclude virtual environment directories
+venv/
+.venv/
+env/
+
+# Exclude settings files for local development
+local_settings.py
+
+# Exclude IDE-specific files and directories
+.vscode/
+.idea/
+
+# Exclude pycache and migrations from apps
+*/__pycache__/
+*/migrations/

@@ -154,18 +154,21 @@ def update_task(request, task_id):
     
     # Check if the task is completed
     if task.is_completed:
-        # If the task is completed, return a custom response with CSS and a "Go Back" button
-        return render(request, 'forbidden_task.html')
+        # If the task is completed, return a forbidden response
+       return redirect('forbidden_task')
     
     user_timezone = request.session.get('user_timezone', 'UTC')
 
     if request.method == 'POST':
         form = TaskForm(request.POST, request.FILES, instance=task)
         if form.is_valid():
-            # Delete existing images
-            for image in task.images.all():
-                default_storage.delete(image.image.name)
-                image.delete()
+            # Delete existing images if selected
+            if 'delete_images' in request.POST:
+                images_to_delete = request.POST.getlist('delete_images')
+                for image_id in images_to_delete:
+                    image = Photo.objects.get(id=image_id)
+                    default_storage.delete(image.image.name)
+                    image.delete()
 
             # Add the new images
             for image in request.FILES.getlist('new_images'):
@@ -179,6 +182,7 @@ def update_task(request, task_id):
         form = TaskForm(instance=task)
     
     return render(request, 'update_task.html', {'form': form, 'task': task, 'user_timezone': user_timezone})
+
 
 
 
@@ -207,7 +211,10 @@ def completed_task_delete(request, task_id):
     return redirect('completed_tasks')
 
 
-
-
 def forbidden_task(request):
     return render(request, 'forbidden_task.html')
+
+def custom_404(request, exception):
+    return render(request, '404.html', status=404)
+
+

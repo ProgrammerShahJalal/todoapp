@@ -94,8 +94,8 @@
                 <td>
                     <ul>
                         {% for photo in task.images.all %}
-                            <li><img class="m-1 border border-success" src="{{ photo.image.url }}" width="100" height="100" alt="Task Photo"></li>
-                        {% endfor %}
+                        <li><img class="m-1 border border-success" src="{{ photo.image.url }}" width="100" height="100" alt="Task Photo"></li>
+                    {% endfor %}
                     </ul>
                 </td>
                 <td class="align-middle">
