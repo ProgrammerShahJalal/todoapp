@@ -106,14 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'shah.jalal.ju.bd@gmail.com'
-EMAIL_HOST_PASSWORD = 'Psycure@#58'
-DEFAULT_FROM_EMAIL = 'shah.jalal.ju.bd@gmail.com'
-
 
 
 # Internationalization
@@ -121,7 +113,7 @@ DEFAULT_FROM_EMAIL = 'shah.jalal.ju.bd@gmail.com'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Dhaka'
 USE_TZ = True
 
 USE_I18N = True

@@ -17,9 +17,6 @@ from .forms import TaskForm, TaskFilterForm
 
 
 
-@login_required
-def home(request):
-    return render(request, 'home.html')
 
 """ ================ AUTHENTICATION START ============== """
 
@@ -47,12 +44,12 @@ def user_login(request):
 
                 if user is not None:
                     login(request, user)
-                    return redirect('home')
+                    return redirect('show_tasks')
         else:
             form = AuthenticationForm()
         return render(request, 'registration/login.html', {'form': form})
     else:
-        return redirect('home')
+        return redirect('show_tasks')
 
 def user_logout(request):
     logout(request)
@@ -64,11 +61,14 @@ def user_logout(request):
 
 """ ================ AUTHENTICATION END ============== """
 
+@login_required
 def add_task(request):
     if request.method == 'POST':
         form = TaskForm(request.POST, request.FILES)
         if form.is_valid():
-            task = form.save()
+            task = form.save(commit=False)  # Create a task object without saving to the database
+            task.user = request.user  # Set the user for the task
+            task.save()  # Save the task with the associated user
 
             for image in request.FILES.getlist('images'):
                 photo = Photo(image=image)
@@ -83,6 +83,7 @@ def add_task(request):
 
 
 
+@login_required
 def edit_task(request, task_id):
     task = TaskModel.objects.get(pk=task_id)
     user_timezone = request.session.get('user_timezone', 'UTC')  # Retrieve the user's time zone
@@ -112,7 +113,7 @@ def edit_task(request, task_id):
 
 
 
-
+@login_required
 def show_tasks(request):
     user_timezone = request.session.get('user_timezone', 'UTC')  # Retrieve the user's time zone
 
@@ -122,7 +123,7 @@ def show_tasks(request):
     is_completed = request.GET.get('is_completed')
     due_date = request.GET.get('due_date')
 
-    tasks = TaskModel.objects.all()
+    tasks = TaskModel.objects.filter(user=request.user)
 
     if title:
         tasks = tasks.filter(taskTitle__icontains=title)
@@ -165,22 +166,25 @@ def show_tasks(request):
 
 
 
-
+@login_required
 def complete_task(request, task_id):
     task = TaskModel.objects.get(pk=task_id)
     task.is_completed = True
     task.save()
     return redirect('completed_tasks')
 
+@login_required
 def delete_task(request, task_id):
     task = TaskModel.objects.get(pk=task_id)
     task.delete()
     return redirect('show_tasks')
 
+@login_required
 def completed_tasks(request):
-    tasks = TaskModel.objects.filter(is_completed=True)
+    tasks = TaskModel.objects.filter(is_completed=True, user=request.user)
     return render(request, 'completed_tasks.html', {'tasks': tasks})
 
+@login_required
 def completed_task_delete(request, task_id):
     task = TaskModel.objects.get(pk=task_id)
     task.delete()

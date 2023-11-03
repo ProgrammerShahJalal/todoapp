@@ -1,8 +1,23 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+<div class="w-full mx-auto text-center px-5 mt-5">
+    <h2>Welcome to Your Task Manager</h2>
+    {% if user.is_authenticated %}
+      <p>Hello, {{ user.username }}. You are logged in.</p>
+      <a class="btn btn-primary" href="{% url 'logout' %}">Logout</a>
+    {% else %}
+      <p>You are not logged in. Please <a class="btn btn-primary" href="{% url 'login' %}">log in</a>.</p>
+    {% endif %}
+    <div>
+      <img class="w-25" src="https://img.freepik.com/free-vector/tiny-man-sitting-chair-with-laptop-checklist-background_74855-20395.jpg?w=740&t=st=1698927068~exp=1698927668~hmac=c120b6060db1c4d04bb45fc15f7cd259f5b759a772abeae43c9a3cb897529166" alt="welcome  todo app">
+    </div>
+  </div>
+
 <h2 class="text-center my-3 text-success">My Tasks</h2>
 
+{% if tasks %}
 <div class="mx-5 my-3">
     <form method="get" action="" id="filter-form">
         <div class="row mb-3">
@@ -42,6 +57,7 @@
         <a href="?clear_all" class="btn btn-secondary">Clear All</a>
     </form>
 </div>
+{% endif %}
 
 {% if tasks %}
 <div class="px-5 table-responsive">
