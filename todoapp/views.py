@@ -11,8 +11,8 @@ from django.http import HttpResponseForbidden
 from django.template import RequestContext
 from django.core.files import File
 from django.db.models import Q
-from datetime import datetime
 from django.utils import timezone
+from datetime import datetime, timedelta
 import pytz
 from .models import TaskModel, Photo
 from .forms import TaskForm, TaskFilterForm
@@ -95,15 +95,21 @@ def show_tasks(request):
     due_date = request.GET.get('due_date')
 
     tasks = TaskModel.objects.filter(user=request.user)
-
+    created_at_start = None  # Define created_at_start
+    created_at_end = None  # Define created_at_end
+    
     if title:
         tasks = tasks.filter(taskTitle__icontains=title)
-
+        
+        
     if created_at:
-        # Parse the date string and convert to user's timezone
         created_at = datetime.strptime(created_at, "%Y-%m-%d").date()
         created_at = pytz.timezone('UTC').localize(datetime(created_at.year, created_at.month, created_at.day))
         created_at = created_at.astimezone(pytz.timezone(user_timezone))
+        tasks = tasks.filter(created_at__date=created_at)
+        created_at_start = created_at - timedelta(days=1)  
+        created_at_end = created_at + timedelta(days=1)
+        
         # Filter tasks based on the date
         tasks = tasks.filter(created_at__date=created_at)
         tasks = tasks.filter(created_at__range=(created_at_start, created_at_end))
