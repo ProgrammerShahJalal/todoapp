@@ -28,7 +28,7 @@ class TaskModel(models.Model):
         return self.taskTitle
 
 class Photo(models.Model):
-    image = models.ImageField(upload_to='task_photos')
+    image = models.ImageField(upload_to='todoapp/static/todoapp')
 
     def __str__(self):
         return str(self.image)
